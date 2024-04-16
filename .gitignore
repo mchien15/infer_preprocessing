@@ -1,0 +1,20 @@
+include *.png *.jpg *.jpeg
+
+out_file/heic_fol/030124/*
+out_file/heic_fol/080124/*
+out_file/heic_fol/130124/*
+
+!out_file/heic_fol/030124/.gitkeep
+!out_file/heic_fol/080124/.gitkeep
+!out_file/heic_fol/130124/.gitkeep
+
+out_file/image1/*
+!out_file/image1/.gitkeep
+
+out_file/pdf1_image/*
+!out_file/pdf1_image/.gitkeep
+
+out_file/pdf2_image/*
+!out_file/pdf2_image/.gitkeep
+
+__pycache__/
