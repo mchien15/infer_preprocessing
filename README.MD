@@ -13,5 +13,5 @@ Run this command
 ```
 python ../src/page_dewarp/temp_image.py /path/to/input/image
 ```
-### For unwarping and corner detecting
+### For unwarping multiple images in a folder
 Run `inference.ipynb` file
