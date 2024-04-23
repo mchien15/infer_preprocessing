@@ -68,6 +68,7 @@ def resize_to_screen(cv2_img, copy=False):
 
 def calculate_page_extents(small):
     height, width = small.shape[:2]
+    print(height, width)
     xmin = cfg.image_opts.PAGE_MARGIN_X
     ymin = cfg.image_opts.PAGE_MARGIN_Y
     xmax, ymax = (width - xmin), (height - ymin)
