@@ -54,17 +54,20 @@ def draw_correspondences(img, dstpoints, projpts):
 
 def resize_to_screen(cv2_img, copy=False):
     height, width = cv2_img.shape[:2]
-    scl_x = float(width) / cfg.image_opts.SCREEN_MAX_W
-    scl_y = float(height) / cfg.image_opts.SCREEN_MAX_H
-    scl = int(np.ceil(max(scl_x, scl_y)))
-    if scl > 1.0:
-        inv_scl = 1.0 / scl
-        img = cv2_resize(cv2_img, (0, 0), None, inv_scl, inv_scl, INTER_AREA)
-    elif copy:
-        img = cv2_img.copy()
+    if height < 1000 and width < 1000:
+        return cv2_img
     else:
-        img = cv2_img
-    return img
+        scl_x = float(width) / cfg.image_opts.SCREEN_MAX_W
+        scl_y = float(height) / cfg.image_opts.SCREEN_MAX_H
+        scl = int(np.ceil(max(scl_x, scl_y)))
+        if scl > 1.0:
+            inv_scl = 1.0 / scl
+            img = cv2_resize(cv2_img, (0, 0), None, inv_scl, inv_scl, INTER_AREA)
+        elif copy:
+            img = cv2_img.copy()
+        else:
+            img = cv2_img
+        return img
 
 def calculate_page_extents(small):
     height, width = small.shape[:2]
@@ -105,7 +108,6 @@ def threshold(stem, cv2_img, small, page_dims, params):
 
 def optimise_params(dstpoints, span_counts, params):
     
-    global skip_process
     skip_process = False
 
     keypoint_index = make_keypoint_index(span_counts)
@@ -121,11 +123,12 @@ def optimise_params(dstpoints, span_counts, params):
         # print('dstpoints shape: ', dstpoints.shape)
         return np.sum((dstpoints - ppts) ** 2)
 
+    print('span_counts: ', span_counts)
     print("  initial objective is", objective(params))
-    if objective(params) < 0.0008 or (objective(params) < 0.002 and 35 < len(params) < 60):
+    if objective(params) < 0.0008 or (objective(params) < 0.002 and 35 < len(span_counts) < 150):
         print("  skipping optimization because objective is already low")
         skip_process = True
-        return params
+        return params, skip_process
 
     print("  optimizing", len(params), "parameters...")
     start = dt.now()
@@ -136,7 +139,7 @@ def optimise_params(dstpoints, span_counts, params):
     print(f"  optimization took {round((end - start).total_seconds(), 2)} sec.")
     print(f"  final objective is {round(res.fun, 5)}")
     params = res.x
-    return params
+    return params, skip_process
 
 def four_point_transform(image, pts):
 
@@ -181,6 +184,9 @@ def main(imgfile):
 
     if len(spans) < 1:
         print(f"skipping {file_path.stem} because only {len(spans)} spans")
+        color_converted = cv2.cvtColor(cv2_img, cv2.COLOR_BGR2RGB)
+        pil_image=Image.fromarray(color_converted)
+        return pil_image
     else:
         span_points = sample_spans(small.shape, spans)
         n_pts = sum(map(len, span_points))
@@ -193,8 +199,9 @@ def main(imgfile):
 
         dstpoints = np.vstack((corners[0].reshape((1, 1, 2)),) + tuple(span_points))
 
-        params = optimise_params(dstpoints, span_counts, params)
+        params, skip_process = optimise_params(dstpoints, span_counts, params)
 
+        print('skip_process: ', skip_process)
         if skip_process:
             color_converted = cv2.cvtColor(cv2_img, cv2.COLOR_BGR2RGB)
             pil_image=Image.fromarray(color_converted)

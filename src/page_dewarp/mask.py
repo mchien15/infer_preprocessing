@@ -40,15 +40,15 @@ class Mask:
         )
         self.log(0.1, "thresholded", mask)
         mask = (
-            dilate(mask, box(9, 1))
-            # dilate(mask, box(5, 1))
+            # dilate(mask, box(9, 1))
+            dilate(mask, box(5, 1))
             if self.text
             else erode(mask, box(3, 1), iterations=3)
             # else erode(mask, box(1, 1), iterations=1)
         )
         self.log(0.2, "dilated" if self.text else "eroded", mask)
-        mask = erode(mask, box(1, 3)) if self.text else dilate(mask, box(8, 2))
-        # mask = erode(mask, box(1, 5)) if self.text else dilate(mask, box(9, 3))
+        # mask = erode(mask, box(1, 3)) if self.text else dilate(mask, box(8, 2))
+        mask = erode(mask, box(1, 3)) if self.text else dilate(mask, box(4, 1))
         self.log(0.3, "eroded" if self.text else "dilated", mask)
         self.value = np.minimum(mask, self.pagemask)
 
