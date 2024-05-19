@@ -49,7 +49,7 @@ def main(input_path, output_path, cleanup):
 
             result = pdf_photo_model.run([pdf_photo_model_output_name], {pdf_photo_model_input_name: np.array([img], dtype=np.float32)})
 
-            print(result)
+            # print(result)
             print('Classified as class: ' + classes[np.argmax(result)])
 
             end_time = time.time()
@@ -66,9 +66,9 @@ def main(input_path, output_path, cleanup):
             else:
 
                 start_time = time.time()
-                print(img_path)
+                # print(img_path)
                 pil_image = unwarping_module(img_path)
-                print(type(pil_image))
+                # print(type(pil_image))
                 img = cv2.cvtColor(np.array(pil_image), cv2.COLOR_RGB2BGR)
 
                 end_time = time.time()
@@ -86,7 +86,7 @@ def main(input_path, output_path, cleanup):
                 rs_img = resizeAndPad(img, (480, 480))
                 rs_img = cv2.cvtColor(rs_img, cv2.COLOR_BGR2RGB)
                 rs_img = rs_img / 255.0
-                print(rs_img.shape)
+                # print(rs_img.shape)
                 result = sar_model.run([sar_model_output_name], {sar_model_input_name: np.array([rs_img], dtype=np.float32)})
 
                 rotated = rotate_small_angle(img, result[0])
@@ -105,8 +105,8 @@ def main(input_path, output_path, cleanup):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Inference script with input and output paths as arguments")
-    parser.add_argument("--input_path", type=str, nargs='?', help="Path to the directory containing input images", default='example_input')
-    parser.add_argument("--output_path", type=str, nargs='?', help="Path to the directory where output images will be saved", default='example_output')
+    parser.add_argument("--input_path", type=str, nargs='?', help="Path to the directory containing input images", default='src/page_dewarp/example_input')
+    parser.add_argument("--output_path", type=str, nargs='?', help="Path to the directory where output images will be saved", default='src/page_dewarp/example_output')
     parser.add_argument("--cleanup", action='store_true', help="Delete the contents of the unwarping_output folder")
     args = parser.parse_args()
     main(args.input_path, args.output_path, args.cleanup)

@@ -123,7 +123,7 @@ def optimise_params(dstpoints, span_counts, params):
         # print('dstpoints shape: ', dstpoints.shape)
         return np.sum((dstpoints - ppts) ** 2)
 
-    print('span_counts: ', span_counts)
+    # print('span_counts: ', span_counts)
     print("  initial objective is", objective(params))
     if objective(params) < 0.0008 or (objective(params) < 0.002 and 35 < len(span_counts) < 150):
         print("  skipping optimization because objective is already low")
@@ -214,6 +214,6 @@ def main(imgfile):
         threshfile = threshold(file_path.stem, cv2_img, small, page_dims, params)
 
         time_end = time.time()
-        print(f"Total preprocess time: {time_end - time_start:.5f}s")
+        # print(f"Total preprocess time: {time_end - time_start:.5f}s")
         
         return threshfile
