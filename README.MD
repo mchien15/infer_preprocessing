@@ -1,17 +1,21 @@
-# Preprocessing Module
-## How to run
+# Preprocessing Module (skip pdf images + unwarping + small rotation)
+
+## How to use
 ### Install required packages
 ```
 pip install -r requirements.txt
 ```
-### For unwarping a single image
-Make a folder to contain output image, for example, `out_file`, then navigate to that folder
+### Preprocessing multiple images in a folder
+<!-- 
+#### Option 1: Use `inference.ipynb` file -->
+
+#### Run `inference.py` file with example images:
 ```
-mkdir out_file && cd out_file
+python src/page_dewarp/inference.py
 ```
-Run this command
+Output images will be stored in `example_output` folder
+
+#### Or you can test with your own images by using:
 ```
-python ../src/page_dewarp/temp_image.py /path/to/input/image
+python src/page_dewarp/inference.py --input_path=/path/to/your/input/folder --output_path=/path/to/your/output/folder
 ```
-### For unwarping multiple images in a folder
-Run `inference.ipynb` file

@@ -18,3 +18,14 @@ out_file/pdf2_image/*
 !out_file/pdf2_image/.gitkeep
 
 __pycache__/
+
+debug
+
+out_file*
+
+test*
+
+example_output/*
+!example_output/.gitkeep
+
+*.ipynb

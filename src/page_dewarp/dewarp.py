@@ -1,8 +1,10 @@
 import base64
 import numpy as np
+import cv2
 from cv2 import (
     ADAPTIVE_THRESH_MEAN_C,
     BORDER_REPLICATE,
+    BORDER_CONSTANT,
     COLOR_RGB2GRAY,
     INTER_AREA,
     INTER_CUBIC,
@@ -66,7 +68,8 @@ class RemappedImage:
             image_y_coords,
             INTER_CUBIC,
             None,
-            BORDER_REPLICATE,
+            BORDER_CONSTANT,
+            cv2.mean(img_gray),
         )
         if cfg.output_opts.NO_BINARY:
             thresh = remapped
