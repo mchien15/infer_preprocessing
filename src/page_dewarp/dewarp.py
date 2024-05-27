@@ -8,6 +8,8 @@ from cv2 import (
     COLOR_RGB2GRAY,
     INTER_AREA,
     INTER_CUBIC,
+    INTER_LINEAR,
+    INTER_LANCZOS4,
     THRESH_BINARY,
     adaptiveThreshold,
     cvtColor,
@@ -56,17 +58,19 @@ class RemappedImage:
         image_x_coords = image_points[:, 0, 0].reshape(page_x_coords.shape)
         image_y_coords = image_points[:, 0, 1].reshape(page_y_coords.shape)
         image_x_coords = resize(
-            image_x_coords, (width, height), interpolation=INTER_CUBIC
+            image_x_coords, (width, height), interpolation=INTER_LINEAR
+            # image_x_coords, (width, height), interpolation=INTER_LANCZOS4
         )
         image_y_coords = resize(
-            image_y_coords, (width, height), interpolation=INTER_CUBIC
+            image_y_coords, (width, height), interpolation=INTER_LINEAR
+            # image_y_coords, (width, height), interpolation=INTER_LANCZOS4
         )
         img_gray = cvtColor(img, COLOR_RGB2GRAY)
         remapped = remap(
             img_gray,
             image_x_coords,
             image_y_coords,
-            INTER_CUBIC,
+            INTER_LINEAR,
             None,
             BORDER_CONSTANT,
             cv2.mean(img_gray),

@@ -44,10 +44,10 @@ def main(input_path, output_path, cleanup):
 
             # plt.imshow(img)
             # plt.show()
-            img = cv2.resize(img, (480, 480))
-            img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+            resized_img = cv2.resize(img, (480, 480))
+            resized_img = cv2.cvtColor(resized_img, cv2.COLOR_BGR2RGB)
 
-            result = pdf_photo_model.run([pdf_photo_model_output_name], {pdf_photo_model_input_name: np.array([img], dtype=np.float32)})
+            result = pdf_photo_model.run([pdf_photo_model_output_name], {pdf_photo_model_input_name: np.array([resized_img], dtype=np.float32)})
 
             # print(result)
             print('Classified as class: ' + classes[np.argmax(result)])

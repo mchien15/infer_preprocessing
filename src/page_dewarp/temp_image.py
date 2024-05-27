@@ -133,6 +133,7 @@ def optimise_params(dstpoints, span_counts, params):
     print("  optimizing", len(params), "parameters...")
     start = dt.now()
 
+    # res = minimize(objective, params, method="SLSQP")
     res = minimize(objective, params, method="SLSQP")
 
     end = dt.now()
