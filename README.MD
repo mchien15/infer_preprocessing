@@ -1,4 +1,4 @@
-# Preprocessing Module (skip pdf images + unwarping + small rotation)
+# Preprocessing Module (skip pdf images + unwarping + small rotation + corner detect)
 
 ## How to use
 ### Install required packages
