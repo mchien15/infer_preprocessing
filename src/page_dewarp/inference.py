@@ -7,12 +7,15 @@ import subprocess
 import argparse
 from utils import rotate_small_angle, resizeAndPad
 from temp_image import main as unwarping_module
+from ultralytics import YOLO
 
 pdf_photo_model = ort.InferenceSession('src/page_dewarp/model/pdf_photo.onnx')
 pdf_photo_model_input_name, pdf_photo_model_output_name = pdf_photo_model.get_inputs()[0].name, pdf_photo_model.get_outputs()[0].name
 
 sar_model = ort.InferenceSession('src/page_dewarp/model/sar.onnx')
 sar_model_input_name, sar_model_output_name = sar_model.get_inputs()[0].name, sar_model.get_outputs()[0].name
+
+page_detect_model = YOLO('src/page_dewarp/model/best.onnx')
 
 # if not os.path.exists('unwarping_output'):
 #     os.makedirs('unwarping_output')
@@ -97,7 +100,20 @@ def main(input_path, output_path, cleanup):
 
                 print('Rotatingtime: ', rotate_time)
 
-                cv2.imwrite(os.path.join(output_path, image), rotated)
+                start_time = time.time()
+
+                results = page_detect_model.predict(rotated, save_crop=False)
+
+                box = results[0].boxes.cpu().xyxy[0].numpy()
+                x1, y1, x2, y2 = map(int, box)
+
+                cropped_img = rotated[y1:y2, x1:x2]
+
+                end_time = time.time()
+
+                print('Detection time: ', end_time - start_time)
+
+                cv2.imwrite(os.path.join(output_path, image), cropped_img)
                     
                 print('-' * 50)
         except Exception:

@@ -29,3 +29,9 @@ example_output/*
 !example_output/.gitkeep
 
 *.ipynb
+
+name_and_time
+
+*.pt
+
+obj_detect*
