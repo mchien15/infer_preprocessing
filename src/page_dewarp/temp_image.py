@@ -125,7 +125,7 @@ def optimise_params(dstpoints, span_counts, params):
 
     # print('span_counts: ', span_counts)
     print("  initial objective is", objective(params))
-    if objective(params) < 0.0008 or (objective(params) < 0.002 and 35 < len(span_counts) < 150):
+    if objective(params) < 0.0008 or (objective(params) < 0.0023 and 35 < len(span_counts) < 150):
         print("  skipping optimization because objective is already low")
         skip_process = True
         return params, skip_process
@@ -165,11 +165,12 @@ def four_point_transform(image, pts):
 
     return warped
 
-def main(imgfile):
-        
-    time_start = time.time()
+def main(imgfile, actual_image=None):
     
-    cv2_img = imread(imgfile)
+    if actual_image is not None:
+        cv2_img = actual_image
+    else:
+        cv2_img = imread(imgfile)
     file_path = Path(imgfile).resolve()
     small = resize_to_screen(cv2_img)
 

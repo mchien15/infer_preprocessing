@@ -35,3 +35,21 @@ name_and_time
 *.pt
 
 obj_detect*
+
+dewarp_yolo_sar*
+
+yolo_dewarp_sar*
+
+dewarp_sar_yolo*
+
+derive_cubic.py
+
+*pdf*
+
+graphics_service.py
+
+yolo_test
+
+sar_0.27*
+
+plot_cubic*

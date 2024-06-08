@@ -3,9 +3,9 @@ import cv2
 import numpy as np
 import os
 import time
-import subprocess
 import argparse
-from utils import rotate_small_angle, resizeAndPad
+from utils import *
+from skimage.transform import rotate
 from temp_image import main as unwarping_module
 from ultralytics import YOLO
 
@@ -17,20 +17,13 @@ sar_model_input_name, sar_model_output_name = sar_model.get_inputs()[0].name, sa
 
 page_detect_model = YOLO('src/page_dewarp/model/best.onnx')
 
-# if not os.path.exists('unwarping_output'):
-#     os.makedirs('unwarping_output')
-#     # subprocess.run(['touch', 'unwarping_output/.gitkeep'])
-#     open('unwarping_output/.gitkeep', 'a').close()
-
-unwarping_output = os.path.join(os.getcwd(), 'unwarping_output')
-
 def main(input_path, output_path, cleanup):
 
     if not os.path.exists(output_path):
         print('Creating output directory: ' + output_path)
         os.makedirs(output_path)
 
-    for image in os.listdir(input_path):
+    for image in sorted(os.listdir(input_path)):
         try:
             if image == '.gitkeep':
                 continue
@@ -69,10 +62,23 @@ def main(input_path, output_path, cleanup):
             else:
 
                 start_time = time.time()
+
+                results = page_detect_model.predict(img, save_crop=False)
+
+                box = results[0].boxes.cpu().xyxy[0].numpy()
+                x1, y1, x2, y2 = map(int, box)
+
+                cropped_img = img[y1:y2, x1:x2]
+
+                end_time = time.time()
+
+                print('Detection time: ', end_time - start_time)
+
+                start_time = time.time()
                 # print(img_path)
-                pil_image = unwarping_module(img_path)
+                pil_image = unwarping_module(img_path, actual_image=cropped_img)
                 # print(type(pil_image))
-                img = cv2.cvtColor(np.array(pil_image), cv2.COLOR_RGB2BGR)
+                unwarped_img = cv2.cvtColor(np.array(pil_image), cv2.COLOR_RGB2BGR)
 
                 end_time = time.time()
 
@@ -80,19 +86,20 @@ def main(input_path, output_path, cleanup):
 
                 print('Unwarping time: ', unwarping_time)
 
-                # print(unwarping_output + '/' + image.split(".")[0] + '_remap.png')
-
-                # unwarped_img = cv2.imread(unwarping_output + '/' + image.split(".")[0] + '_remap.png')
-
                 start_time = time.time()
 
-                rs_img = resizeAndPad(img, (480, 480))
+                rs_img = resizeAndPad(unwarped_img, (480, 480))
                 rs_img = cv2.cvtColor(rs_img, cv2.COLOR_BGR2RGB)
                 rs_img = rs_img / 255.0
                 # print(rs_img.shape)
                 result = sar_model.run([sar_model_output_name], {sar_model_input_name: np.array([rs_img], dtype=np.float32)})
 
-                rotated = rotate_small_angle(img, result[0])
+                rotated = rotate_small_angle(unwarped_img, result[0])
+
+                # gray_img = rgb2gray(img)
+                # resized_image = resize(img, (img.shape[0] // 4, img.shape[1] // 4))
+
+                # rotated = rotate(img, get_skew_angle(resized_image), cval=1)
 
                 # print('Rotated by: ', result[0], ' degrees')
 
@@ -100,20 +107,30 @@ def main(input_path, output_path, cleanup):
 
                 print('Rotatingtime: ', rotate_time)
 
-                start_time = time.time()
-
-                results = page_detect_model.predict(rotated, save_crop=False)
+                results = page_detect_model.predict(rotated)
 
                 box = results[0].boxes.cpu().xyxy[0].numpy()
                 x1, y1, x2, y2 = map(int, box)
 
                 cropped_img = rotated[y1:y2, x1:x2]
 
-                end_time = time.time()
+                resized_img = cv2.resize(cropped_img, (cropped_img.shape[1]//4, cropped_img.shape[0]//4))
 
-                print('Detection time: ', end_time - start_time)
+                gray_image = cv2.cvtColor(resized_img, cv2.COLOR_RGB2GRAY)
 
-                cv2.imwrite(os.path.join(output_path, image), cropped_img)
+                start_time = time.time()
+
+                skew_angle = skew_angle_hough_transform_avarage(gray_image)
+
+                rotated = rotate(cropped_img, skew_angle, cval=1)
+
+                # resized_img = cv2.resize(rotated, (rotated.shape[1]//4, rotated.shape[0]//4))
+
+                # rotated_2 = rotate(rotated, get_skew_angle(resized_img), cval=1)
+
+                # img_with_grid = draw_grid(rotated.copy())
+
+                cv2.imwrite(os.path.join(output_path, image), rotated*255)
                     
                 print('-' * 50)
         except Exception:
