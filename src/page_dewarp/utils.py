@@ -107,13 +107,13 @@ def skew_angle_hough_transform_avarage(image):
     angles_deg = np.rad2deg(angles)
 
     horizontal_angles = angles_deg[(angles_deg > 80) & (angles_deg < 100)]
-    # horizontal_angles = angles_deg[(angles_deg > 60) & (angles_deg < 120) | (angles_deg > 240) & (angles_deg < 300)]
 
     if len(horizontal_angles) == 0:
         print("No horizontal lines detected.")
         return 0
 
-    mean_angle_deg = np.mean(angles_deg) #test
+    # mean_angle_deg = np.mean(angles_deg) #test
+    mean_angle_deg = np.mean(horizontal_angles)
 
     mean_angle = np.deg2rad(mean_angle_deg)
 
