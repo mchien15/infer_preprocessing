@@ -1,5 +1,5 @@
 # Preprocessing Module
-### Skip PDF Images, Unwarping, Small Rotation, and Document Page Detection
+### Skip PDF Images, Document Page Detection, Image Dewarping, and Skewness Correction
 
 ## How to Use
 
